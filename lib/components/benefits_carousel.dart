@@ -12,24 +12,19 @@ class BenefitsCarousel extends StatefulWidget {
 class _BenefitsCarouselState extends State<BenefitsCarousel> {
   late ScrollController scrollController;
   List<double> scrollPositions = [];
-  Container ct = Container(
-    width: 20,
-  );
   List<Widget> iconItems = [];
+  List<Widget> dots = [];
   int currentScroll = 0;
+
   @override
   void initState() {
     super.initState();
     scrollController = ScrollController();
-    /* scrollController.addListener(() {
-      debugPrint(scrollController.offset.toString());
-    }); */
   }
 
   @override
   void dispose() {
     scrollController.dispose();
-
     super.dispose();
   }
 
@@ -39,42 +34,58 @@ class _BenefitsCarouselState extends State<BenefitsCarousel> {
       width: MediaQuery.of(context).size.width * 0.98,
       child: Padding(
         padding: const EdgeInsets.only(top: 40),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            InkWell(
-              borderRadius: const BorderRadius.all(Radius.circular(100)),
-              onTap: () {
-                scrollPositions.isEmpty ? initializeScrollList(context) : null;
-                currentScroll = currentScroll != 0 ? currentScroll - 1 : 0;
-                scrollController.animateTo(scrollPositions[currentScroll],
-                    duration: const Duration(milliseconds: 200),
-                    curve: Curves.easeInOut);
-              },
-              child: Transform.rotate(
-                angle: pi,
-                child: Image.asset('assets/images/carousel/arrowControl.png'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                InkWell(
+                  borderRadius: const BorderRadius.all(Radius.circular(100)),
+                  onTap: () {
+                    setState(() {
+                      currentScroll =
+                          currentScroll != 0 ? currentScroll - 1 : 0;
+                      scrollController.animateTo(scrollPositions[currentScroll],
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeInOut);
+                    });
+                  },
+                  child: Transform.rotate(
+                    angle: pi,
+                    child:
+                        Image.asset('assets/images/carousel/arrowControl.png'),
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  child: _getIconsList(),
+                ),
+                InkWell(
+                    borderRadius: const BorderRadius.all(Radius.circular(100)),
+                    onTap: () {
+                      setState(() {
+                        currentScroll =
+                            currentScroll != scrollPositions.length - 1
+                                ? currentScroll + 1
+                                : scrollPositions.length - 1;
+                      });
+                      scrollController.animateTo(scrollPositions[currentScroll],
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeInOut);
+                    },
+                    child:
+                        Image.asset('assets/images/carousel/arrowControl.png'))
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: dots,
               ),
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.7,
-              child: _getIconsList(),
-            ),
-            InkWell(
-                borderRadius: const BorderRadius.all(Radius.circular(100)),
-                onTap: () {
-                  scrollPositions.isEmpty
-                      ? initializeScrollList(context)
-                      : null;
-                  currentScroll = currentScroll != scrollPositions.length - 1
-                      ? currentScroll + 1
-                      : scrollPositions.length - 1;
-                  scrollController.animateTo(scrollPositions[currentScroll],
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeInOut);
-                },
-                child: Image.asset('assets/images/carousel/arrowControl.png'))
+            )
           ],
         ),
       ),
@@ -86,10 +97,11 @@ class _BenefitsCarouselState extends State<BenefitsCarousel> {
         future: carouselProvider.loadData(),
         builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
           return SingleChildScrollView(
-            //physics: const NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             scrollDirection: Axis.horizontal,
             controller: scrollController,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: _carouselItem(snapshot.data, context),
             ),
           );
@@ -104,23 +116,38 @@ class _BenefitsCarouselState extends State<BenefitsCarousel> {
             child: Image.asset(icon['route'])));
       }
     }
+
+    initializeScrollList(context);
+    debugPrint('jumm');
     return iconItems;
   }
 
   void initializeScrollList(BuildContext context) {
+    debugPrint('hola');
     int pieces = iconItems.length ~/ 2;
-    double step = 183.27;
-    debugPrint(step.toString());
-    scrollPositions.add(scrollController.position.minScrollExtent);
-    for (int i = 1; i < pieces - 1; i++) {
-      if (i == 1) {
-        scrollPositions.add(scrollPositions[i - 1] + (step * 3 / 2));
-      } else {
-        scrollPositions.add(scrollPositions[i - 1] + step);
+    const double step = 275;
+    for (int i = 0; i < pieces; i++) {
+      scrollPositions.add(i == 0 ? 0 : (scrollPositions[i - 1] + step));
+      dots.add(AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: i == currentScroll ? 1 : 0.2,
+        child: Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(
+              gradient: LinearGradient(colors: [
+                Theme.of(context).colorScheme.primary,
+                Theme.of(context).colorScheme.secondary
+              ]),
+              borderRadius: const BorderRadius.all(Radius.circular(100))),
+        ),
+      ));
+
+      if (i != pieces - 1) {
+        dots.add(const SizedBox(
+          width: 15,
+        ));
       }
     }
-    scrollPositions.add(scrollController.position.maxScrollExtent);
-
-    debugPrint(scrollPositions.toString());
   }
 }

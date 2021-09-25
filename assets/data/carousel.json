@@ -23,30 +23,6 @@
         {
             "name": "WorkLastTech",
             "route": "assets/images/carousel/workLastTech.png"
-        },
-        {
-            "name": "Capacitations",
-            "route": "assets/images/carousel/capacitations.png"
-        },
-        {
-            "name": "FreeSnacks",
-            "route": "assets/images/carousel/freeSnacks.png"
-        },
-        {
-            "name": "HomeOffice",
-            "route": "assets/images/carousel/homeOffice.png"
-        },
-        {
-            "name": "RemoteWeek",
-            "route": "assets/images/carousel/remoteWeek.png"
-        },
-        {
-            "name": "ScheduleFlex",
-            "route": "assets/images/carousel/scheduleFlex.png"
-        },
-        {
-            "name": "WorkLastTech",
-            "route": "assets/images/carousel/workLastTech.png"
         }
     ]
 }
