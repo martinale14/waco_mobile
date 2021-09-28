@@ -17,16 +17,19 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late ScrollController _scrollController;
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
+    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -38,6 +41,7 @@ class _HomePageState extends State<HomePage>
         child: Stack(
           children: [
             SingleChildScrollView(
+              controller: _scrollController,
               child: Stack(
                 alignment: Alignment.topCenter,
                 children: [
@@ -73,7 +77,10 @@ class _HomePageState extends State<HomePage>
             Menu(buttonOnTap: () {
               _controller.forward();
             }),
-            Navigation(controller: _controller),
+            Navigation(
+              controller: _controller,
+              scrollController: _scrollController,
+            ),
           ],
         ),
       ),

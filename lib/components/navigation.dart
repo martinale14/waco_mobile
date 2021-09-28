@@ -5,8 +5,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 class Navigation extends StatefulWidget {
   final AnimationController controller;
+  final ScrollController scrollController;
 
-  const Navigation({Key? key, required this.controller}) : super(key: key);
+  const Navigation(
+      {Key? key, required this.controller, required this.scrollController})
+      : super(key: key);
 
   @override
   State<Navigation> createState() => _NavigationState();
@@ -91,7 +94,12 @@ class _NavigationState extends State<Navigation>
                   height: 40,
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    widget.scrollController.animateTo(0,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut);
+                    widget.controller.reverse();
+                  },
                   borderRadius: const BorderRadius.all(Radius.circular(100)),
                   child: Container(
                     alignment: Alignment.center,
@@ -100,12 +108,17 @@ class _NavigationState extends State<Navigation>
                     child: const Text(
                       'INICIO',
                       style:
-                          TextStyle(fontWeight: FontWeight.w100, fontSize: 24),
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                     ),
                   ),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    widget.scrollController.animateTo(675,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut);
+                    widget.controller.reverse();
+                  },
                   borderRadius: const BorderRadius.all(Radius.circular(100)),
                   child: Container(
                     alignment: Alignment.center,
@@ -114,8 +127,28 @@ class _NavigationState extends State<Navigation>
                     child: const Text(
                       'BENEFICIOS',
                       style:
-                          TextStyle(fontWeight: FontWeight.w100, fontSize: 24),
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                     ),
+                  ),
+                ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, 'home');
+                  },
+                  borderRadius: const BorderRadius.all(Radius.circular(100)),
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/loginBtnMarquee.png',
+                        scale: 0.7,
+                      ),
+                      const Text(
+                        'Login',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600, fontSize: 18),
+                      ),
+                    ],
                   ),
                 ),
               ],
