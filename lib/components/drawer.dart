@@ -1,16 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:waco_mobile/providers/user_provider.dart';
 import 'package:waco_mobile/utils/dimens.dart';
 
 class FeedDrawer extends StatelessWidget {
-  const FeedDrawer({Key? key, required this.uid, this.email}) : super(key: key);
-
-  final String uid;
-  final String? email;
+  const FeedDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     ColorScheme palette = Theme.of(context).colorScheme;
+    final UserProvider user = Provider.of(context);
     return Drawer(
       child: Container(
         color: palette.surface,
@@ -29,7 +29,7 @@ class FeedDrawer extends StatelessWidget {
                     size: 100,
                   ),
                   Text(
-                    email ?? 'Email',
+                    user.email,
                     style: TextStyle(
                         fontSize: 20,
                         color: palette.onPrimary,
@@ -44,7 +44,11 @@ class FeedDrawer extends StatelessWidget {
                 color: Colors.white70,
               ),
               title: const Text('Inicio', style: TextStyle(fontSize: 20)),
-              onTap: () {},
+              onTap: () {
+                if (ModalRoute.of(context)!.settings.name != 'feed') {
+                  Navigator.pushReplacementNamed(context, 'feed');
+                }
+              },
             ),
             ListTile(
               trailing: const Icon(
@@ -52,7 +56,11 @@ class FeedDrawer extends StatelessWidget {
                 color: Colors.white70,
               ),
               title: const Text('Favoritos', style: TextStyle(fontSize: 20)),
-              onTap: () {},
+              onTap: () {
+                if (ModalRoute.of(context)!.settings.name != 'favorites') {
+                  Navigator.pushReplacementNamed(context, 'favorites');
+                }
+              },
             ),
             ListTile(
               trailing: const Icon(
