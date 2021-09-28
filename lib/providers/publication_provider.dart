@@ -22,8 +22,7 @@ class PublicationProvider {
             body: publication['body'],
             userId: publication['user'],
             link: publication['link']));
-      }
-      try {
+
         UserLikes userLikes = await UserLikesProvider.getLikes(uid);
         for (Publication pub in pubs) {
           for (int id in userLikes.likes) {
@@ -32,8 +31,29 @@ class PublicationProvider {
             }
           }
         }
-      } catch (e) {
-        debugPrint(e.toString());
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+    return pubs;
+  }
+
+  static Future<List<Publication>> getLikedPulications(String uid) async {
+    List<Publication> pubs = [];
+    try {
+      UserLikes userLikes = await UserLikesProvider.getLikes(uid);
+      for (int id in userLikes.likes) {
+        final response =
+            await Dio().get('http://waco-api.herokuapp.com/api/posts/$id');
+        Map<String, dynamic> data = json.decode(response.toString());
+        var publication = data['data'];
+        pubs.add(Publication(
+            id: publication['id'],
+            title: publication['title'],
+            body: publication['body'],
+            userId: publication['user'],
+            link: publication['link'],
+            favorite: true));
       }
     } catch (e) {
       debugPrint(e.toString());

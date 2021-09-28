@@ -13,13 +13,15 @@ class PublicationCard extends StatefulWidget {
     required this.id,
     required this.title,
     required this.body,
-    this.favourite = false,
+    required this.favourite,
+    this.onFavorite,
   }) : super(key: key);
 
   final String title;
   final String body;
   final int id;
   final bool favourite;
+  final Function? onFavorite;
 
   @override
   State<PublicationCard> createState() => _PublicationCardState();
@@ -36,6 +38,7 @@ class _PublicationCardState extends State<PublicationCard> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint(widget.id.toString() + ' favorite: $favorite');
     final UserProvider user = Provider.of(context);
     ColorScheme palette = Theme.of(context).colorScheme;
     Shader linearGradient =
@@ -73,19 +76,40 @@ class _PublicationCardState extends State<PublicationCard> {
                           CollectionReference usersLikes = FirebaseFirestore
                               .instance
                               .collection('usersLikes');
-                          usersLikes.doc(user.uid).set({
-                            "likes": [widget.id, ...userLikes.likes]
-                          });
+                          usersLikes.doc(user.uid).set(
+                            {
+                              "likes": [widget.id, ...userLikes.likes]
+                            },
+                          );
                         } catch (e) {
                           CollectionReference usersLikes = FirebaseFirestore
                               .instance
                               .collection('usersLikes');
-                          usersLikes.doc(user.uid).set({
-                            "likes": [widget.id]
-                          });
+                          usersLikes.doc(user.uid).set(
+                            {
+                              "likes": [widget.id]
+                            },
+                          );
+                        }
+                      } else {
+                        try {
+                          UserLikes userLikes =
+                              await UserLikesProvider.getLikes(user.uid);
+                          List<int> newLikes = userLikes.likes
+                              .where((like) => like != widget.id)
+                              .toList();
+                          CollectionReference usersLikes = FirebaseFirestore
+                              .instance
+                              .collection('usersLikes');
+                          usersLikes.doc(user.uid).set({"likes": newLikes});
+                        } catch (e) {
+                          debugPrint(e.toString());
                         }
                       }
                       setState(() {});
+                      if (widget.onFavorite != null) {
+                        widget.onFavorite!();
+                      }
                     },
                     child: SizedBox(
                       width: 32,

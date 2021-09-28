@@ -106,6 +106,7 @@ class _FeedState extends State<Feed> {
                     itemCount: pubs.length,
                     itemBuilder: (context, i) {
                       return PublicationCard(
+                        key: Key(pubs[i].id.toString()),
                         id: pubs[i].id,
                         title: pubs[i].title,
                         body: pubs[i].body,
