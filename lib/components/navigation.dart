@@ -133,7 +133,8 @@ class _NavigationState extends State<Navigation>
                 ),
                 InkWell(
                   onTap: () {
-                    Navigator.pushNamed(context, 'home');
+                    Navigator.pushNamed(context, 'login');
+                    widget.controller.reverse();
                   },
                   borderRadius: const BorderRadius.all(Radius.circular(100)),
                   child: Stack(

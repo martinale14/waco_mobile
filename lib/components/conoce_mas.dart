@@ -16,6 +16,9 @@ class ConoceMas extends StatelessWidget {
     TextTheme textTheme = Theme.of(context).textTheme;
     return Column(
       children: [
+        const SizedBox(
+          height: 30,
+        ),
         Stack(
           alignment: Alignment.center,
           children: [
@@ -87,7 +90,34 @@ class ConoceMas extends StatelessWidget {
                           child: SvgPicture.asset('assets/svg/instagram.svg'),
                         ),
                       ),
-                      const Button()
+                      Button(
+                          label: 'Conocer más',
+                          buttonTap: () async {
+                            const String url = 'https://wacoservices.com/';
+                            if (await canLaunch(url)) {
+                              await launch(url);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor:
+                                      Theme.of(context).colorScheme.surface,
+                                  content: const Text(
+                                      'La página web no puede ser lanzada'),
+                                  action: SnackBarAction(
+                                    textColor: Theme.of(context)
+                                        .textTheme
+                                        .bodyText1!
+                                        .color,
+                                    label: 'vale',
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context)
+                                          .hideCurrentSnackBar();
+                                    },
+                                  ),
+                                ),
+                              );
+                            }
+                          }),
                     ],
                   ),
                 )

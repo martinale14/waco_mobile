@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:waco_mobile/utils/dimens.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class Button extends StatelessWidget {
-  const Button({Key? key}) : super(key: key);
+  final Function buttonTap;
+  final String label;
+
+  const Button({Key? key, required this.buttonTap, this.label = 'Button'})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,32 +34,15 @@ class Button extends StatelessWidget {
           borderRadius: const BorderRadius.all(
             Radius.circular(100),
           ),
-          onTap: () async {
-            const String url = 'https://wacoservices.com/';
-            if (await canLaunch(url)) {
-              await launch(url);
-            } else {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  backgroundColor: Theme.of(context).colorScheme.surface,
-                  content: const Text('La página web no puede ser lanzada'),
-                  action: SnackBarAction(
-                    textColor: Theme.of(context).textTheme.bodyText1!.color,
-                    label: 'vale',
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    },
-                  ),
-                ),
-              );
-            }
+          onTap: () {
+            buttonTap();
           },
           child: Container(
             alignment: Alignment.center,
             width: dimens.width(context, .48),
             height: dimens.height(context, .07),
             child: Text(
-              'Conocer más',
+              label,
               style: TextStyle(
                 fontSize: 18,
                 color: textTheme.headline1!.color,

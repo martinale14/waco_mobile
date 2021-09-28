@@ -6,11 +6,10 @@ import 'package:waco_mobile/utils/dimens.dart';
 
 class Menu extends StatelessWidget {
   final Function buttonOnTap;
+  final bool? close;
 
-  const Menu({
-    Key? key,
-    required this.buttonOnTap,
-  }) : super(key: key);
+  const Menu({Key? key, required this.buttonOnTap, this.close})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +48,7 @@ class Menu extends StatelessWidget {
                     ),
                   ),
                   MenuButton(
+                    close: close ?? false,
                     buttonOnTap: () {
                       buttonOnTap();
                     },
