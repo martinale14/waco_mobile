@@ -3,79 +3,50 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class MenuButton extends StatefulWidget {
-  const MenuButton({Key? key}) : super(key: key);
+  final Function buttonOnTap;
+  final bool close;
+  const MenuButton({Key? key, required this.buttonOnTap, this.close = false})
+      : super(key: key);
 
   @override
   _MenuButtonState createState() => _MenuButtonState();
 }
 
 class _MenuButtonState extends State<MenuButton> with TickerProviderStateMixin {
-  late AnimationController _controller;
-  late AnimationController _consecutive;
-  late Animation _middleSize;
-  late Animation _margin;
-  late Animation _rotation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-        duration: const Duration(milliseconds: 100), vsync: this);
-    _consecutive = AnimationController(
-        duration: const Duration(milliseconds: 100), vsync: this);
-    _middleSize = Tween<double>(begin: 30, end: 0).animate(_controller)
-      ..addListener(() {
-        _controller.isCompleted ? _consecutive.forward() : null;
-        setState(() {});
-      });
-    _margin = Tween<double>(begin: 20, end: 0).animate(_controller)
-      ..addListener(() {
-        setState(() {});
-      });
-    _rotation = Tween<double>(begin: 0, end: 45).animate(_consecutive)
-      ..addListener(() {
-        _consecutive.isDismissed ? _controller.reverse() : null;
-        setState(() {});
-      });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: const BorderRadius.all(Radius.circular(100)),
       onTap: () {
-        _controller.isCompleted
-            ? _consecutive.reverse()
-            : _controller.forward();
+        widget.buttonOnTap();
       },
       child: Container(
+        alignment: Alignment.center,
+        width: MediaQuery.of(context).size.width * 0.12,
+        height: MediaQuery.of(context).size.width * 0.12,
+        padding: const EdgeInsets.all(5),
+        child: Stack(
           alignment: Alignment.center,
-          width: MediaQuery.of(context).size.width * 0.12,
-          height: MediaQuery.of(context).size.width * 0.12,
-          padding: const EdgeInsets.all(5),
-          child: Stack(alignment: Alignment.center, children: [
+          children: [
             buildPiece(
-                margin: EdgeInsets.only(bottom: _margin.value),
-                rotation: _rotation.value),
-            buildPiece(width: _middleSize.value),
+              margin: EdgeInsets.only(bottom: widget.close ? 0 : 20),
+              angle: widget.close ? 45 : 0,
+            ),
+            buildPiece(width: widget.close ? 0 : 30),
             buildPiece(
-                margin: EdgeInsets.only(top: _margin.value),
-                rotation: -_rotation.value)
-          ])),
+              margin: EdgeInsets.only(top: widget.close ? 0 : 20),
+              angle: widget.close ? -45 : 0,
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget buildPiece(
-      {EdgeInsetsGeometry? margin, double? width, double? rotation}) {
+      {EdgeInsetsGeometry? margin, double? width, double angle = 0}) {
     return Transform.rotate(
-      angle: (rotation ?? 0) * (pi / 180),
-      alignment: Alignment.center,
+      angle: angle * (pi / 180),
       child: (Container(
         margin: margin ?? EdgeInsets.zero,
         height: 3,
