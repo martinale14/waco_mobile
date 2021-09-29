@@ -151,6 +151,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                             passwordValidationText
                                                 .isNotEmpty)) {
                                       toast.showToast(
+                                        gravity: ToastGravity.TOP,
                                         child: const CustomToast(
                                             msg:
                                                 'Por favor llene correctamente el formulario'),
