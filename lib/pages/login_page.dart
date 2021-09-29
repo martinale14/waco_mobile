@@ -137,6 +137,8 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                               email: _emailController.text,
                                               password:
                                                   _passwordController.text);
+                                      Navigator.pushReplacementNamed(
+                                          context, 'intermediate');
                                     } on FirebaseAuthException catch (e) {
                                       if (e.code == 'user-not-found') {
                                         debugPrint(

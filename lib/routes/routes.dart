@@ -9,7 +9,7 @@ Map<String, WidgetBuilder> getRoutes() {
   return <String, WidgetBuilder>{
     "home": (BuildContext context) => const HomePage(),
     "login": (BuildContext context) => const Login(),
-    "intermidiate": (BuildContext context) => const Intermidiate(),
+    "intermediate": (BuildContext context) => const Intermediate(),
     "feed": (BuildContext context) => const Feed(),
     "favorites": (BuildContext context) => const Favorites(),
   };

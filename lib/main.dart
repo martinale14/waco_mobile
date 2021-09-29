@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:waco_mobile/pages/intermidiate.dart';
 import 'package:waco_mobile/providers/user_provider.dart';
 import 'package:waco_mobile/routes/routes.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -99,9 +98,7 @@ class MyApp extends StatelessWidget {
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
                     fontSize: 34))),
-        home: const Intermidiate(
-          subscribe: true,
-        ),
+        initialRoute: 'intermediate',
         routes: getRoutes(),
       ),
     );
