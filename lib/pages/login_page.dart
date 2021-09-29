@@ -117,7 +117,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                   onChange: (value) {
                                     setState(() {
                                       emailValidationText =
-                                          validateEmail(value);
+                                          Validator.validateEmail(value);
                                     });
                                   },
                                   type: TextInputType.emailAddress,
@@ -133,7 +133,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                   onChange: (value) {
                                     setState(() {
                                       passwordValidationText =
-                                          validatePassword(value);
+                                          Validator.validatePassword(value);
                                     });
                                   },
                                   hideContent: true,
@@ -216,7 +216,9 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
           ),
         ));
   }
+}
 
+class Validator {
   static String validateEmail(String email) {
     String validationMessage = '';
 
