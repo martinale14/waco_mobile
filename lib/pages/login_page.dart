@@ -1,7 +1,10 @@
 import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:waco_mobile/Components/menu.dart';
+import 'package:waco_mobile/components/alert_dialog.dart';
+import 'package:waco_mobile/components/custom_toast.dart';
 import 'package:waco_mobile/components/gradient_button.dart';
 import 'package:waco_mobile/components/input.dart';
 import 'package:waco_mobile/components/navigation.dart';
@@ -19,6 +22,11 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
   late ScrollController _scrollController;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
+  String emailValidationText = '';
+  String passwordValidationText = '';
+
+  final FToast toast = FToast();
+
   @override
   void initState() {
     super.initState();
@@ -27,6 +35,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
     _scrollController = ScrollController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    toast.init(context);
   }
 
   @override
@@ -48,7 +57,6 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
         backgroundColor: palette.background,
         body: SafeArea(
           child: SingleChildScrollView(
-            physics: const NeverScrollableScrollPhysics(),
             child: GestureDetector(
               onTap: () {
                 FocusScope.of(context).unfocus();
@@ -103,27 +111,33 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                   height: 50,
                                 ),
                                 CustomInput(
+                                  validationText: emailValidationText,
                                   label: 'Correo',
                                   controller: _emailController,
-                                  onChange: (value) {},
+                                  onChange: (value) {
+                                    setState(() {
+                                      emailValidationText =
+                                          validateEmail(value);
+                                    });
+                                  },
                                   type: TextInputType.emailAddress,
-                                  icon: const Icon(
-                                    Icons.email,
-                                    color: Colors.white70,
-                                  ),
+                                  icon: Icons.email,
                                 ),
                                 const SizedBox(
                                   height: 30,
                                 ),
                                 CustomInput(
+                                  validationText: passwordValidationText,
                                   label: 'Contraseña',
                                   controller: _passwordController,
-                                  onChange: (value) {},
+                                  onChange: (value) {
+                                    setState(() {
+                                      passwordValidationText =
+                                          validatePassword(value);
+                                    });
+                                  },
                                   hideContent: true,
-                                  icon: const Icon(
-                                    Icons.lock,
-                                    color: Colors.white70,
-                                  ),
+                                  icon: Icons.lock,
                                 ),
                                 const SizedBox(
                                   height: 50,
@@ -131,21 +145,50 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                 Button(
                                   label: 'Login',
                                   buttonTap: () async {
-                                    try {
-                                      await FirebaseAuth.instance
-                                          .signInWithEmailAndPassword(
-                                              email: _emailController.text,
-                                              password:
-                                                  _passwordController.text);
-                                      Navigator.pushReplacementNamed(
-                                          context, 'intermediate');
-                                    } on FirebaseAuthException catch (e) {
-                                      if (e.code == 'user-not-found') {
-                                        debugPrint(
-                                            'No user found for that email.');
-                                      } else if (e.code == 'wrong-password') {
-                                        debugPrint(
-                                            'Wrong password provided for that user.');
+                                    if ((_emailController.text.isEmpty ||
+                                            _passwordController.text.isEmpty) ||
+                                        (emailValidationText.isNotEmpty ||
+                                            passwordValidationText
+                                                .isNotEmpty)) {
+                                      toast.showToast(
+                                        child: const CustomToast(
+                                            msg:
+                                                'Por favor llene correctamente el formulario'),
+                                      );
+                                    }
+                                    if (emailValidationText.isEmpty &&
+                                        passwordValidationText.isEmpty) {
+                                      try {
+                                        await FirebaseAuth.instance
+                                            .signInWithEmailAndPassword(
+                                                email: _emailController.text,
+                                                password:
+                                                    _passwordController.text);
+                                        Navigator.of(context)
+                                            .pushNamedAndRemoveUntil(
+                                                'intermediate',
+                                                (Route<dynamic> route) =>
+                                                    false);
+                                      } on FirebaseAuthException catch (e) {
+                                        if (e.code == 'user-not-found') {
+                                          showDialog(
+                                              barrierDismissible: false,
+                                              context: context,
+                                              builder: (context) {
+                                                return const InfoAlertDialog(
+                                                    message:
+                                                        'Usuario no encontrado');
+                                              });
+                                        } else if (e.code == 'wrong-password') {
+                                          showDialog(
+                                              barrierDismissible: false,
+                                              context: context,
+                                              builder: (context) {
+                                                return const InfoAlertDialog(
+                                                    message:
+                                                        'Contraseña incorrecta');
+                                              });
+                                        }
                                       }
                                     }
                                   },
@@ -171,5 +214,33 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
             ),
           ),
         ));
+  }
+
+  static String validateEmail(String email) {
+    String validationMessage = '';
+
+    if (!RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(email)) {
+      validationMessage = 'Dirección de correo invalida';
+    }
+    if (email.isEmpty) {
+      validationMessage = 'El campo no debe estar vacío';
+    }
+
+    return validationMessage;
+  }
+
+  static String validatePassword(String password) {
+    String validationMessage = '';
+
+    if (password.length < 6) {
+      validationMessage = 'La contraseña debe tener al menos 6 caracteres';
+    }
+    if (password.isEmpty) {
+      validationMessage = 'El campo no debe estar vacío';
+    }
+
+    return validationMessage;
   }
 }

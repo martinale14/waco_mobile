@@ -5,19 +5,22 @@ import 'package:waco_mobile/utils/dimens.dart';
 class CustomInput extends StatelessWidget {
   final String label;
   final TextInputType? type;
-  final Icon? icon;
+  final IconData icon;
   final bool hideContent;
   final TextEditingController controller;
   final Function(String) onChange;
-  const CustomInput(
-      {Key? key,
-      this.label = 'input',
-      this.type,
-      this.icon,
-      this.hideContent = false,
-      required this.controller,
-      required this.onChange})
-      : super(key: key);
+  final String validationText;
+
+  const CustomInput({
+    Key? key,
+    this.label = 'input',
+    this.type,
+    required this.icon,
+    this.hideContent = false,
+    required this.controller,
+    required this.validationText,
+    required this.onChange,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -25,14 +28,18 @@ class CustomInput extends StatelessWidget {
     BorderRadius radius = const BorderRadius.all(Radius.circular(100));
     return Container(
       alignment: Alignment.center,
-      width: dimens.width(context, 0.8),
+      width: dimens.width(context, 0.805),
       child: Column(
         children: [
           Container(
             alignment: Alignment.centerLeft,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w300),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w300,
+                color: validationText.isEmpty ? Colors.white70 : Colors.red,
+              ),
             ),
           ),
           const SizedBox(
@@ -45,8 +52,11 @@ class CustomInput extends StatelessWidget {
                 height: 55,
                 decoration: BoxDecoration(
                     borderRadius: radius,
-                    gradient: LinearGradient(
-                        colors: [palette.primary, palette.secondary])),
+                    gradient: validationText.isEmpty
+                        ? LinearGradient(
+                            colors: [palette.primary, palette.secondary])
+                        : const LinearGradient(
+                            colors: [Colors.red, Colors.red])),
               ),
               Container(
                 padding: dimens.symmetric(context, .04, 0),
@@ -68,15 +78,52 @@ class CustomInput extends StatelessWidget {
                   style: const TextStyle(color: Colors.white70, fontSize: 20),
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    icon: icon ??
-                        const Icon(
-                          Icons.text_fields,
-                          color: Colors.white70,
-                        ),
+                    icon: Icon(
+                      icon,
+                      color:
+                          validationText.isEmpty ? Colors.white70 : Colors.red,
+                    ),
                   ),
                 ),
               ),
             ],
+          ),
+          validationText.isEmpty
+              ? const SizedBox(
+                  height: 0,
+                  width: 0,
+                )
+              : const SizedBox(
+                  height: 10,
+                ),
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: dimens.symmetric(context, 0.05, 0),
+            child: validationText.isEmpty
+                ? const SizedBox(
+                    height: 0,
+                    width: 0,
+                  )
+                : Row(
+                    children: [
+                      const Icon(
+                        Icons.cancel,
+                        color: Colors.red,
+                      ),
+                      const SizedBox(
+                        width: 15,
+                      ),
+                      Flexible(
+                        child: Text(
+                          validationText,
+                          style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w300),
+                        ),
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),

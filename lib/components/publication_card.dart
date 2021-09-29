@@ -38,7 +38,6 @@ class _PublicationCardState extends State<PublicationCard> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(widget.id.toString() + ' favorite: $favorite');
     final UserProvider user = Provider.of(context);
     ColorScheme palette = Theme.of(context).colorScheme;
     Shader linearGradient =

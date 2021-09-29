@@ -71,7 +71,8 @@ class FeedDrawer extends StatelessWidget {
                   const Text('Cerrar Sesión', style: TextStyle(fontSize: 20)),
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
-                Navigator.pushReplacementNamed(context, 'intermediate');
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    'intermediate', (Route<dynamic> route) => false);
               },
             ),
           ],
