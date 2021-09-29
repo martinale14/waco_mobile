@@ -22,7 +22,9 @@ class PublicationProvider {
             body: publication['body'],
             userId: publication['user'],
             link: publication['link']));
+      }
 
+      try {
         UserLikes userLikes = await UserLikesProvider.getLikes(uid);
         for (Publication pub in pubs) {
           for (int id in userLikes.likes) {
@@ -31,6 +33,8 @@ class PublicationProvider {
             }
           }
         }
+      } catch (e) {
+        return pubs;
       }
     } catch (e) {
       debugPrint(e.toString());
@@ -57,6 +61,7 @@ class PublicationProvider {
       }
     } catch (e) {
       debugPrint(e.toString());
+      return pubs;
     }
     return pubs;
   }
