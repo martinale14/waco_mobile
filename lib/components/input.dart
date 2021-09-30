@@ -118,7 +118,7 @@ class CustomInput extends StatelessWidget {
                           validationText,
                           style: const TextStyle(
                               color: Colors.red,
-                              fontSize: 24,
+                              fontSize: 18,
                               fontWeight: FontWeight.w300),
                         ),
                       ),

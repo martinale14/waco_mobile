@@ -1,29 +1,34 @@
 import 'dart:math';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:waco_mobile/Components/menu.dart';
-import 'package:waco_mobile/components/alert_dialog.dart';
 import 'package:waco_mobile/components/custom_toast.dart';
 import 'package:waco_mobile/components/gradient_button.dart';
 import 'package:waco_mobile/components/input.dart';
+import 'package:waco_mobile/components/menu.dart';
 import 'package:waco_mobile/components/navigation.dart';
 import 'package:waco_mobile/utils/dimens.dart';
 
-class Login extends StatefulWidget {
-  const Login({Key? key}) : super(key: key);
+import 'login_page.dart';
+
+class Registro extends StatefulWidget {
+  const Registro({Key? key}) : super(key: key);
 
   @override
-  _LoginState createState() => _LoginState();
+  _RegistroState createState() => _RegistroState();
 }
 
-class _LoginState extends State<Login> with TickerProviderStateMixin {
+class _RegistroState extends State<Registro>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late ScrollController _scrollController;
   late TextEditingController _emailController;
   late TextEditingController _passwordController;
+  late TextEditingController _comfirmPasswordController;
   String emailValidationText = '';
   String passwordValidationText = '';
+  String comfirmPasswordValidationText = '';
 
   final FToast toast = FToast();
 
@@ -35,6 +40,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
     _scrollController = ScrollController();
     _emailController = TextEditingController();
     _passwordController = TextEditingController();
+    _comfirmPasswordController = TextEditingController();
     toast.init(context);
   }
 
@@ -44,6 +50,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
     _scrollController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _comfirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -101,7 +108,7 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                 SizedBox(
                                   width: dimens.width(context, .8),
                                   child: Text(
-                                    'Login',
+                                    'Registro',
                                     style: TextStyle(
                                         foreground: Paint()
                                           ..shader = linearGradient),
@@ -133,7 +140,28 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                   onChange: (value) {
                                     setState(() {
                                       passwordValidationText =
-                                          Validator.validatePassword(value);
+                                          Validator.validateNewPassword(value);
+                                      comfirmPasswordValidationText =
+                                          Validator.validateConfirmation(
+                                              _comfirmPasswordController.text,
+                                              value);
+                                    });
+                                  },
+                                  hideContent: true,
+                                  icon: Icons.lock,
+                                ),
+                                const SizedBox(
+                                  height: 30,
+                                ),
+                                CustomInput(
+                                  validationText: comfirmPasswordValidationText,
+                                  label: 'Comfirmar contraseña',
+                                  controller: _comfirmPasswordController,
+                                  onChange: (value) {
+                                    setState(() {
+                                      comfirmPasswordValidationText =
+                                          Validator.validateConfirmation(
+                                              value, _passwordController.text);
                                     });
                                   },
                                   hideContent: true,
@@ -143,12 +171,15 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                   height: 50,
                                 ),
                                 Button(
-                                  label: 'Login',
+                                  label: 'Crear cuenta',
                                   buttonTap: () async {
                                     if ((_emailController.text.isEmpty ||
-                                            _passwordController.text.isEmpty) ||
+                                            _passwordController.text.isEmpty ||
+                                            _comfirmPasswordController
+                                                .text.isEmpty) ||
                                         (emailValidationText.isNotEmpty ||
-                                            passwordValidationText
+                                            passwordValidationText.isNotEmpty ||
+                                            comfirmPasswordValidationText
                                                 .isNotEmpty)) {
                                       toast.showToast(
                                         gravity: ToastGravity.TOP,
@@ -158,8 +189,14 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                       );
                                     }
                                     if (emailValidationText.isEmpty &&
-                                        passwordValidationText.isEmpty) {
+                                        passwordValidationText.isEmpty &&
+                                        comfirmPasswordValidationText.isEmpty) {
                                       try {
+                                        await FirebaseAuth.instance
+                                            .createUserWithEmailAndPassword(
+                                                email: _emailController.text,
+                                                password:
+                                                    _passwordController.text);
                                         await FirebaseAuth.instance
                                             .signInWithEmailAndPassword(
                                                 email: _emailController.text,
@@ -171,25 +208,20 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                                 (Route<dynamic> route) =>
                                                     false);
                                       } on FirebaseAuthException catch (e) {
-                                        if (e.code == 'user-not-found') {
-                                          showDialog(
-                                              barrierDismissible: false,
-                                              context: context,
-                                              builder: (context) {
-                                                return const InfoAlertDialog(
-                                                    message:
-                                                        'Usuario no encontrado');
-                                              });
-                                        } else if (e.code == 'wrong-password') {
-                                          showDialog(
-                                              barrierDismissible: false,
-                                              context: context,
-                                              builder: (context) {
-                                                return const InfoAlertDialog(
-                                                    message:
-                                                        'Contraseña incorrecta');
-                                              });
+                                        if (e.code == 'weak-password') {
+                                          debugPrint(
+                                              'The password provided is too weak.');
+                                        } else if (e.code ==
+                                            'email-already-in-use') {
+                                          toast.showToast(
+                                            gravity: ToastGravity.TOP,
+                                            child: const CustomToast(
+                                                msg:
+                                                    'El correo ya se encuentra en uso'),
+                                          );
                                         }
+                                      } catch (e) {
+                                        debugPrint(e.toString());
                                       }
                                     }
                                   },
@@ -216,88 +248,4 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
           ),
         ));
   }
-}
-
-class Validator {
-  static String validateEmail(String email) {
-    String validationMessage = '';
-
-    if (!RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(email)) {
-      validationMessage = 'Dirección de correo invalida';
-    }
-    if (email.isEmpty) {
-      validationMessage = 'El campo no debe estar vacío';
-    }
-
-    return validationMessage;
-  }
-
-  static String validatePassword(String password) {
-    String validationMessage = '';
-
-    if (password.length < 6) {
-      validationMessage = 'La contraseña debe tener al menos 6 caracteres';
-    }
-    if (password.isEmpty) {
-      validationMessage = 'El campo no debe estar vacío';
-    }
-
-    return validationMessage;
-  }
-
-  static String validateConfirmation(String value, String password) {
-    String validationMessage = '';
-
-    if (value != password) {
-      validationMessage = 'Las contraseñas no coinciden';
-    }
-
-    return validationMessage;
-  }
-
-  static String validateNewPassword(String password) {
-    String validationMessage = '';
-
-    bool hasUppercase = false;
-    bool hasLowercase = false;
-    bool hasNumber = false;
-    bool hasSpecialCharacter =
-        password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
-
-    if (password.isEmpty) {
-      return 'El campo no debe estar vacío';
-    }
-
-    if (password.length < 6) {
-      return 'La contraseña debe tener al menos 6 caracteres';
-    }
-
-    for (int i = 0; i < password.length; i++) {
-      if (password[i] == password[i].toUpperCase() &&
-          !isDigit(password[i], 0)) {
-        hasUppercase = true;
-      }
-      if (password[i] == password[i].toLowerCase() &&
-          !isDigit(password[i], 0)) {
-        hasLowercase = true;
-      }
-
-      if (isDigit(password[i], 0)) {
-        hasNumber = true;
-      }
-    }
-
-    validationMessage += hasUppercase ? '' : '\n Mínimo una mayúscula';
-    validationMessage += hasLowercase ? '' : '\n Mínimo una minúscula';
-    validationMessage += hasNumber ? '' : '\n Mínimo un número';
-    validationMessage +=
-        hasSpecialCharacter ? '' : '\n Mínimo un caracter especial';
-
-    return validationMessage;
-  }
-
-  static bool isDigit(String s, int idx) =>
-      "0".compareTo(s[idx]) <= 0 && "9".compareTo(s[idx]) >= 0;
 }

@@ -152,6 +152,23 @@ class _NavigationState extends State<Navigation>
                     ],
                   ),
                 ),
+                InkWell(
+                  onTap: () {
+                    Navigator.pushNamed(context, 'registro');
+                    widget.controller.reverse();
+                  },
+                  borderRadius: const BorderRadius.all(Radius.circular(100)),
+                  child: Container(
+                    alignment: Alignment.center,
+                    width: dimens.width(context, .4),
+                    height: dimens.height(context, .08),
+                    child: const Text(
+                      'Registro',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

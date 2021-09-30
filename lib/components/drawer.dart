@@ -28,12 +28,14 @@ class FeedDrawer extends StatelessWidget {
                     color: palette.onPrimary,
                     size: 100,
                   ),
-                  Text(
-                    user.email,
-                    style: TextStyle(
-                        fontSize: 20,
-                        color: palette.onPrimary,
-                        fontWeight: FontWeight.w600),
+                  Flexible(
+                    child: Text(
+                      user.email,
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: palette.onPrimary,
+                          fontWeight: FontWeight.w600),
+                    ),
                   ),
                 ],
               ),
