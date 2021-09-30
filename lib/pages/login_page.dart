@@ -193,6 +193,21 @@ class _LoginState extends State<Login> with TickerProviderStateMixin {
                                       }
                                     }
                                   },
+                                ),
+                                const SizedBox(height: 50),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.pushNamed(context, 'registro');
+                                  },
+                                  child: Text(
+                                    'Crear una cuenta',
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .primary,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w300),
+                                  ),
                                 )
                               ],
                             ),
